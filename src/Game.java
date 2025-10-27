@@ -101,13 +101,13 @@ public class Game {
         Tools.clearConsole();
         printGameTitle();
         Tools.printToConsole("You've encountered a " + enemy.getName());
-        printBattleStatus(player, enemy);
+        Tools.printToConsole(printBattleStatus(player, enemy));
         Tools.waitForUser(input);
 
         while (player.isAlive() && enemy.isAlive()) {
             Tools.clearConsole();
             player.attack(enemy);
-            printBattleStatus(player, enemy);
+            Tools.printToConsole(printBattleStatus(player, enemy));
             Tools.printToConsole("⚔ " + player.getName() + " attacks " + enemy.getName() + " and deals " + player.getAttackPower() + " dmg! ⚔");
             Tools.waitForUser(input);
 
@@ -117,7 +117,7 @@ public class Game {
 
             Tools.clearConsole();
             enemy.attack(player);
-            printBattleStatus(player, enemy);
+            Tools.printToConsole(printBattleStatus(player, enemy));
             Tools.printToConsole("⚔ " + enemy.getName() + " attacks " + player.getName() + " and deals " + enemy.getAttackPower() + " dmg! ⚔");
             Tools.waitForUser(input);
         }
@@ -125,7 +125,7 @@ public class Game {
             gameOver = true;
         } else {
             Tools.clearConsole();
-            printBattleStatus(player, enemy);
+            Tools.printToConsole(printBattleStatus(player, enemy));
             Tools.printToConsole("\n\uD83C\uDFC6 You've defeated the " + enemy.getName() + "! \uD83C\uDFC6");
             player.gainXp(enemy.getXpReward());
             Tools.waitForUser(input);
@@ -134,15 +134,13 @@ public class Game {
         }
     }
 
-    public static void printBattleStatus(Player player, Enemy enemy) {
-        System.out.println("\n=================== ⚔ BATTLE ⚔ ===================");
+    public static String printBattleStatus(Player player, Enemy enemy) {
 
-        System.out.printf("%-25s | %-25s%n", "\uD83E\uDDD9" + player.getName(), "\uD83D\uDC79" + enemy.getName());
-
-        System.out.printf("❤️ HP: %-19d | ❤️ HP: %-19d%n",
-                player.getHealth(), enemy.getHealth());
-
-        System.out.println("==================================================\n");
+        return "\n=================== ⚔ BATTLE ⚔ ===================\n" +
+                String.format("%-25s | %-25s%n", "\uD83E\uDDD9" + player.getName(), "\uD83D\uDC79" + enemy.getName()) +
+                String.format("❤️ HP: %-19d | ❤️ HP: %-19d%n",
+                        player.getHealth(), enemy.getHealth()) +
+                "==================================================\n";
     }
 
     private static Enemy pickRandomEnemy() {
@@ -189,7 +187,7 @@ public class Game {
     }
 
     public static void raiseDifficulty() {
-        if (difficulty < BOSS){
+        if (difficulty < BOSS) {
             difficulty++;
             Tools.printToConsole("You've successfully raised the difficulty. Good luck.", true);
             Tools.waitForUser(input);
