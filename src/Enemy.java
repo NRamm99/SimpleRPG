@@ -5,19 +5,16 @@ public class Enemy {
     private final int attackPower;
     private final int difficulty;
     private final int xpReward;
+    public final boolean isDragon;
 
-    public Enemy(String name, int health, int attackPower, int difficulty, int xpReward) {
+    public Enemy(String name, int health, int attackPower, int difficulty, int xpReward, boolean isDragon) {
         this.name = name;
         this.health = health;
         this.maxHP = health;
         this.attackPower = attackPower;
         this.difficulty = difficulty;
         this.xpReward = xpReward;
-    }
-
-    public String attack(Player player, Enemy enemy) {
-        return "⚔" + enemy.name + " attacks " + player.getName() + "⚔"
-                + "\n⚔ It deals " + enemy.attackPower + " dmg! ⚔";
+        this.isDragon = isDragon;
     }
 
     public boolean isAlive() {
@@ -32,24 +29,28 @@ public class Enemy {
         return name;
     }
 
-    public void takeDamage(int damage){
+    public void takeDamage(int damage) {
         health -= damage;
     }
 
-    public int getAttackPower(){
-        return attackPower;
+    public int getDmg(){
+        return (int) ((Math.random() * attackPower) + 1);
     }
 
-    public void attack(Player player){
-        player.takeDamage(attackPower);
+    public void attack(Player player, int dmg) {
+        player.takeDamage(dmg);
     }
 
-    public int getXpReward(){
+    public int getXpReward() {
         return xpReward;
     }
 
     public void heal() {
         health = maxHP;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
     }
 
 }

@@ -1,4 +1,3 @@
-import java.util.Scanner;
 
 public class Player {
     private final String name;
@@ -8,6 +7,7 @@ public class Player {
     private int xp;
     private int level;
     private int xpNeeded;
+    private int healingPotionAmount;
 
     public Player(String name, int health, int attackPower) {
         this.name = name;
@@ -17,11 +17,7 @@ public class Player {
         this.xp = 0;
         this.level = 1;
         this.xpNeeded = 100;
-    }
-
-    public String attack(Player player, Enemy enemy) {
-        return "⚔" + enemy.getName() + " attacks " + enemy.getName() + "⚔"
-                + "\n⚔ It deals " + player.attackPower + " dmg! ⚔";
+        this.healingPotionAmount = 0;
     }
 
     public boolean isAlive() {
@@ -32,11 +28,11 @@ public class Player {
         return health;
     }
 
-    public int getMaxHP(){
+    public int getMaxHP() {
         return maxHP;
     }
 
-    public int getXp(){
+    public int getXp() {
         return xp;
     }
 
@@ -48,20 +44,37 @@ public class Player {
         return level;
     }
 
-    public void attack(Enemy enemy) {
-        enemy.takeDamage(attackPower);
+    public int getHealingPotionAmount() {
+        return healingPotionAmount;
+    }
+
+    public void giveHealPotion() {
+        healingPotionAmount++;
+    }
+
+    public void attack(Enemy enemy, int dmg) {
+        enemy.takeDamage(dmg);
     }
 
     public int getAttackPower() {
         return attackPower;
     }
 
-    public int getXpNeeded(){
+    public int getDmg() {
+        return (int) ((Math.random() * attackPower) + 1);
+    }
+
+    public int getXpNeeded() {
         return xpNeeded;
     }
 
     public void heal() {
         health = maxHP;
+    }
+
+    public void drinkPotion() {
+        health = maxHP;
+        healingPotionAmount--;
     }
 
     public void takeDamage(int damage) {
@@ -84,7 +97,6 @@ public class Player {
 
         xpNeeded = level * 100;
         if (xp >= xpNeeded) {
-            Scanner input = new Scanner(System.in);
             levelUp();
         }
     }

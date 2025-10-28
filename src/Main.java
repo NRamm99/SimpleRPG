@@ -17,12 +17,13 @@ public class Main {
             System.out.println("1... Fight random enemy");
             System.out.println("2... My stats");
             System.out.println("3... Raise difficulty (Recommended level -> " + Game.getRecommendedLevel() + ")");
+            System.out.println("4... Heal " + "(Potions: " + Game.player.getHealingPotionAmount() + ")");
             System.out.println("\n0... Quit");
 
             int userInput;
             while (true) {
                 userInput = Tools.validateInt(input);
-                if (userInput < 0 || userInput > 3) {
+                if (userInput < 0 || userInput > 4) {
                     System.out.println("❌ Please enter a valid number.");
                 } else {
                     break;
@@ -39,14 +40,25 @@ public class Main {
                 case 3:
                     Game.raiseDifficulty();
                     break;
+                case 4:
+                    if (Game.player.getHealingPotionAmount() < 1) {
+                        Tools.printToConsole("You've got no potions.", true);
+                        Tools.waitForUser(input);
+                    } else {
+                        Tools.printToConsole("You've healed!");
+                        Game.player.drinkPotion();
+                        Tools.waitForUser(input);
+                    }
+                    break;
                 case 0:
                     return;
                 default:
             }
         }
-        Tools.printToConsole("GAME OVER... Better luck next time...", true);
+        if (!Game.gameWin) {
+            Tools.printToConsole("GAME OVER... Better luck next time...", true);
+        }
+
 
     }
-
-
 }

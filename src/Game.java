@@ -7,6 +7,7 @@ public class Game {
     static ArrayList<Enemy> enemies = new ArrayList<>();
     static Player player;
     public static boolean gameOver = false;
+    public static boolean gameWin = false;
     static int difficulty = 1;
     static final int BEGINNER = 1;
     static final int EASY = 2;
@@ -68,20 +69,20 @@ public class Game {
 
     private static void addEnemies() {
 
-        enemies.add(new Enemy("Goblin", 30, 5, BEGINNER, 20));
-        enemies.add(new Enemy("Skeleton", 35, 7, BEGINNER, 25));
+        enemies.add(new Enemy("Goblin", 30, 5, BEGINNER, 20, false));
+        enemies.add(new Enemy("Skeleton", 35, 7, BEGINNER, 25, false));
 
-        enemies.add(new Enemy("Zombie", 45, 8, EASY, 35));
-        enemies.add(new Enemy("Orc", 55, 10, EASY, 40));
-        enemies.add(new Enemy("Bandit", 60, 12, EASY, 45));
+        enemies.add(new Enemy("Zombie", 45, 8, EASY, 35, false));
+        enemies.add(new Enemy("Orc", 55, 10, EASY, 40, false));
+        enemies.add(new Enemy("Bandit", 60, 12, EASY, 45, false));
 
-        enemies.add(new Enemy("Dark Knight", 75, 15, NORMAL, 60));
-        enemies.add(new Enemy("Fire Mage", 65, 18, NORMAL, 70));
+        enemies.add(new Enemy("Dark Knight", 75, 15, NORMAL, 60, false));
+        enemies.add(new Enemy("Fire Mage", 65, 18, NORMAL, 70, false));
 
-        enemies.add(new Enemy("Troll", 90, 20, HARD, 85));
-        enemies.add(new Enemy("Vampire", 80, 17, HARD, 90));
+        enemies.add(new Enemy("Troll", 90, 20, HARD, 85, false));
+        enemies.add(new Enemy("Vampire", 80, 17, HARD, 90, false));
 
-        enemies.add(new Enemy("Dragon", 130, 25, BOSS, 120));
+        enemies.add(new Enemy("Dragon", 130, 25, BOSS, 120, true));
     }
 
     public static void printGameTitle() {
@@ -105,10 +106,12 @@ public class Game {
         Tools.waitForUser(input);
 
         while (player.isAlive() && enemy.isAlive()) {
+            int dmg;
             Tools.clearConsole();
-            player.attack(enemy);
+            dmg = player.getDmg();
+            player.attack(enemy, dmg);
             Tools.printToConsole(printBattleStatus(player, enemy));
-            Tools.printToConsole("⚔ " + player.getName() + " attacks " + enemy.getName() + " and deals " + player.getAttackPower() + " dmg! ⚔");
+            Tools.printToConsole("⚔ " + player.getName() + " attacks " + enemy.getName() + " and deals " + dmg + " dmg! ⚔");
             Tools.waitForUser(input);
 
             if (!enemy.isAlive()) {
@@ -116,9 +119,10 @@ public class Game {
             }
 
             Tools.clearConsole();
-            enemy.attack(player);
+            dmg = enemy.getDmg();
+            enemy.attack(player, dmg);
             Tools.printToConsole(printBattleStatus(player, enemy));
-            Tools.printToConsole("⚔ " + enemy.getName() + " attacks " + player.getName() + " and deals " + enemy.getAttackPower() + " dmg! ⚔");
+            Tools.printToConsole("⚔ " + enemy.getName() + " attacks " + player.getName() + " and deals " + dmg + " dmg! ⚔");
             Tools.waitForUser(input);
         }
         if (!player.isAlive()) {
@@ -130,8 +134,26 @@ public class Game {
             player.gainXp(enemy.getXpReward());
             Tools.waitForUser(input);
 
+            int rollDropChance = (int) ((Math.random() * 100) + 1);
+            if (rollDropChance > 70) {
+                player.giveHealPotion();
+            }
+
             enemy.heal();
         }
+
+        if (enemy.isDragon && !enemy.isAlive()) {
+            promptGameWin();
+        }
+
+    }
+
+    private static void promptGameWin() {
+        Tools.printToConsole("✨ You've slain the dragon. ✨" +
+                "✨ This means you've won the game! ✨" +
+                "✨ Amazing job hero! ✨");
+        Tools.waitForUser(input);
+        gameWin = true;
     }
 
     public static String printBattleStatus(Player player, Enemy enemy) {
@@ -144,38 +166,17 @@ public class Game {
     }
 
     private static Enemy pickRandomEnemy() {
-        int rangeStart;
-        int enemiesAmount;
-        switch (difficulty) {
-            case 1: // BEGINNER
-                rangeStart = 0;
-                enemiesAmount = 2;
-                break;
-            case 2: // EASY
-                rangeStart = 2;
-                enemiesAmount = 3;
-                break;
-            case 3: // NORMAL
-                rangeStart = 5;
-                enemiesAmount = 2;
-                break;
-            case 4: // HARD
-                rangeStart = 7;
-                enemiesAmount = 2;
-                break;
-            case 5: // BOSS
-                rangeStart = 9;
-                enemiesAmount = 1;
-                break;
-            default:
-                rangeStart = 1;
-                enemiesAmount = 1;
-                break;
+        Random random = new Random();
+
+        ArrayList<Enemy> matchingEnemy = new ArrayList<>();
+        for (Enemy enemy : enemies) {
+            if (enemy.getDifficulty() == difficulty) {
+                matchingEnemy.add(enemy);
+            }
         }
 
-        Random rand = new Random();
-        int random = (rand.nextInt(enemiesAmount) + rangeStart);
-        return enemies.get(random);
+        int randomIndex = random.nextInt(matchingEnemy.size());
+        return matchingEnemy.get(randomIndex);
     }
 
     public static void printStats() {
